@@ -12,7 +12,8 @@
   :hooks [leiningen.cljsbuild]
 
   :profiles {:dev {:cljsbuild
-                   {:builds {:client {:figwheel {:on-jsload "rama.core/run"}
+                   {:builds {:client {:figwheel {:on-jsload "rama.core/run"
+                                                 :websocket-host "192.168.1.141"}
                                       :compiler {:main "rama.core"
                                                  :asset-path "js"
                                                  :optimizations :none
