@@ -1,47 +1,51 @@
 (ns rama.core
-  (:require-macros [rama.macro :refer [let-map]])
-  (:require [reagent.core :as reagent]
+  (:require-macros [rama.macro :refer [let-map
+                                       prevent-default]])
+  (:require [clojure.string :as str]
+            [reagent.core :as reagent]
             [re-frame.core :as rf]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]))
 
-;; A detailed walk-through of this source code is provied in the docs:
-;; https://github.com/Day8/re-frame/blob/master/docs/CodeWalkthrough.md
+;; -- Development --------------------------------------------------------------
+(enable-console-print!)
 
-;; -- Domino 1 - Event Dispatch -----------------------------------------------
+;; -- Event Dispatch -----------------------------------------------------------
 
 
-;; -- Domino 2 - Event Handlers -----------------------------------------------
+;; -- Event Handlers -----------------------------------------------------------
+
+(defn movies-request
+  []
+  {:method          :get
+   :uri             "http://192.168.1.141:8000/movies"
+   :response-format (ajax/json-response-format {:keywords? true})
+   :on-success      [:process-movies]
+   :on-failure      [:handle-movies-failure]})
 
 (rf/reg-event-fx
   :initialize
   (fn [_ _]
-    {:http-xhrio {:method          :get
-                  :uri             "http://192.168.1.141:8081/movies"
-                  :response-format (ajax/json-response-format {:keywords? true})
-                  :on-success      [:process-movies]
-                  :on-failure      [:handle-movies-failure]}
-     :db {:loading-movies? true
+    {:http-xhrio (movies-request)
+     :db {:movie-status :loading
           :page-number nil
+          :letter nil
           :movies nil}}))
 
 (rf/reg-event-fx
   :fetch-movies
   (fn [{db :db} _]
-    {:http-xhrio {:method          :get
-                  :uri             "http://192.168.1.141:8081/movies"
-                  :response-format (ajax/json-response-format {:keywords? true})
-                  :on-success      [:process-movies]
-                  :on-failure      [:handle-movies-failure]}
-     :db (assoc db :loading-movies? true)}))
+    {:http-xhrio (movies-request)
+     :db (assoc db :movie-status :loading)}))
 
 (rf/reg-event-db
  :process-movies
  (fn [db [_ response]]
    (let [movies (js->clj response)]
-     (merge db {:loading-movies? false
+     (merge db {:movie-status :loaded
                 :page-number 1
-                :movies movies} ))))
+                :letter "A"
+                :movies movies}))))
 
 (rf/reg-event-db
  :previous-page
@@ -54,18 +58,29 @@
    (update db :page-number inc)))
 
 (rf/reg-event-db
+ :to-page
+ (fn [db [_ page-number]]
+   (assoc db :page-number page-number)))
+
+(rf/reg-event-db
+ :to-letter
+ (fn [db [_ letter]]
+   (merge db {:letter letter
+              :page-number 1})))
+
+(rf/reg-event-db
  :handle-movies-failure
  (fn [db [_ response]]
-   db))
+   (merge db {:movie-status :error
+              :error-message (:status-text response)})))
 
 
-;; -- Domino 4 - Query  -------------------------------------------------------
+;; -- Query  -------------------------------------------------------------------
 
-(defn reg-val
-  [k]
-  (rf/reg-sub k (fn [db _] (get db k))))
-
-(reg-val :loading-movies?)
+(rf/reg-sub
+  :movie-state
+  (fn [db _]
+    (select-keys db [:movie-status :error-message])))
 
 (rf/reg-sub
   :movie-count
@@ -73,67 +88,126 @@
     (when movies
       (count movies))))
 
+(def page-size 12)
+
 (rf/reg-sub
   :page
-  (fn [{:keys [page-number movies] :as db} _]
+  (fn [{:keys [page-number letter movies] :as db} _]
     (when movies
-      (let-map [movie-count (count movies)
-                page-count (quot movie-count 10)
-                page-index (* (dec page-number) 10)
-                page (subvec movies page-index (+ page-index 10))]))))
+      (let [movies-for-letter (vec (filter #(= (str/upper-case (:letter %)) letter) movies))]
+        (let-map [letter letter
+                  movie-count (count movies-for-letter)
+                  page-size page-size
+                  page-count (inc (quot movie-count page-size))
+                  page-index (* (dec page-number) page-size)
+                  page-number page-number
+                  page (subvec movies-for-letter page-index (min movie-count (+ page-index page-size)))])))))
 
 
-;; -- Domino 5 - View Functions ----------------------------------------------
+;; -- View Functions -----------------------------------------------------------
 
 (defn button
   [label on-click]
-  [:button {:type "button"
-            :on-click  on-click}
-   label])
+  [:input.btn.btn-default
+   {:type "button"
+    :value label
+    :on-click  on-click}])
 
 (defn movie-item
   [{:keys [status movie-path letter category] :as movie}]
   [:li {:key movie-path} movie-path])
 
+(defn page-link
+  [label f]
+  [:li.page-item
+   {:key label}
+   [:a.page-link
+    {:style {"cursor" "pointer"
+             "color" "#0275d8"}
+     :on-click f}
+    label]])
+
+(defn disabled-page-link
+  [label]
+  [:li.page-item.disabled
+   {:key label}
+   [:span.page-link label]])
+
+(defn active-page-link
+  [label]
+  [:li.page-item.active
+   {:key label}
+   [:span.page-link label]])
+
+(def alphabet "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
 (defn movie-listing
   []
-  (if-let [{:keys [page-number
-                   page-count
-                   movie-count
-                   page]} @(rf/subscribe [:page])]
-    [:div
-     [:span (str movie-count " total movies.")]
-     [:span (str "Page " page-number " of " page-count)]
-     [:ul
-      (for [{:keys [status name]} page]
-        [:li {:key name} name])]]
-    [:span "No movies loaded."]))
+  (when-let [{:keys [page-number
+                     page-count
+                     movie-count
+                     letter
+                     page]} @(rf/subscribe [:page])]
+    [:div.album.text-muted
+     {:style {"paddingBottom" "3em"}}
+     [:div.container
+      [:nav
+       [:ul.pagination
+        (for [item alphabet]
+          (if (= item letter)
+            (active-page-link item)
+            (page-link item #(rf/dispatch [:to-letter item]))))]]
+      [:nav
+       [:ul.pagination
+        (if (= 1 page-number)
+          (disabled-page-link "Previous")
+          (page-link "Previous" #(rf/dispatch [:previous-page])))
+        (for [index (range 1 (inc page-count))]
+          (if (= index page-number)
+            (active-page-link index)
+            (page-link index #(rf/dispatch [:to-page index]))))
+        (if (= page-number page-count)
+          (disabled-page-link "Next")
+          (page-link "Next" #(rf/dispatch [:next-page])))]]
+      [:div.row
+       (for [{:keys [overview release_date status title
+                     shortened-overview] :as movie} page]
+         [:div.card {:key title
+                     :style {"width" "20rem"
+                             "margin" ".75rem"}}
+          ;; [:img.card-img-top {:src "https://image.flaticon.com/icons/png/512/37/37232.png"
+          ;;                     :alft title}]
+          [:div.card-block
+           [:h4.card-title title]
+           [:p.card-text shortened-overview]
+           [:div.card-text [:small.text-muted release_date]]]])]]]))
 
-
-(defn break
+(defn jumbotron
   []
-  [:br])
-
-(defn loading
-  []
-  (when @(rf/subscribe [:loading-movies?])
-    [:span "Loading..."]))
+  (let [{:keys [movie-status error-message]} @(rf/subscribe [:movie-state])]
+    [:section.jumbotron.text-center
+     [:div.container
+      [:h1.jumbotron-heading "Movies"]
+      [:p.lead.text-muted
+       (case movie-status
+         :loading "Loading movies..."
+         :loaded "Here they are!"
+         :error (str "Eek! An error! It says \"" error-message "\"... what?"))]
+      [:p
+       [:a.btn.btn-primary
+        {:href "#"
+         :on-click #(rf/dispatch [:fetch-movies])}
+        "Reload"]]]]))
 
 (defn ui
   []
   [:div
-   [button "Load Movies" #(rf/dispatch [:fetch-movies])]
-   [loading]
-   [:h3 "Movies"]
-   [button "Previous Page" #(rf/dispatch [:previous-page])]
-   [button "Next Page" #(rf/dispatch [:next-page])]
-   [break]
+   [jumbotron]
    [movie-listing]])
 
 ;; -- Entry Point -------------------------------------------------------------
 
 (defn ^:export run
   []
-  (rf/dispatch-sync [:initialize])     ;; puts a value into application state
-  (reagent/render [ui]              ;; mount the application's ui into '<div id="app" />'
-                  (js/document.getElementById "app")))
+  (rf/dispatch-sync [:initialize])
+  (reagent/render [ui] (js/document.getElementById "app")))
