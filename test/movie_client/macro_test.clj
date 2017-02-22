@@ -1,7 +1,7 @@
-(ns rama.core-test
+(ns movie-client.core-test
   (:require [cljs.test :refer-macros [deftest is testing run-tests]]
-            [rama.macro :refer-macros [is-equal]]
-            [rama.core :as core]))
+            [movie-client.macro :refer-macros [is-equal]]
+            [movie-client.core :as core]))
 
 (deftest movies-request
   (testing "build request"

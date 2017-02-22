@@ -1,7 +1,7 @@
-(ns rama.alphabet-test
+(ns movie-client.alphabet-test
   (:refer-clojure :excude [next])
   (:require [clojure.test :refer :all]
-            [rama.alphabet :refer [next
+            [movie-client.alphabet :refer [next
                                    previous
                                    take-after
                                    take-before]]))

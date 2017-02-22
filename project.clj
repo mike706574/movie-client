@@ -1,4 +1,4 @@
-(defproject mike/rama "0.0.1-SNAPSHOT"
+(defproject mike/movie-client "0.0.1-SNAPSHOT"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.9.456"]
                  [reagent "0.6.0"]
@@ -17,9 +17,9 @@
                                   [figwheel-sidecar "0.5.0-2"]]
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
                    :cljsbuild
-                   {:builds {:client {:figwheel {:on-jsload "rama.core/run"
+                   {:builds {:client {:figwheel {:on-jsload "movie-client.core/run"
                                                  :websocket-host "192.168.1.141"}
-                                      :compiler {:main "rama.core"
+                                      :compiler {:main "movie-client.core"
                                                  :asset-path "js"
                                                  :optimizations :none
                                                  :source-map true
@@ -39,4 +39,4 @@
             :test {:source-paths ["src" "test"]
                    :compiler {:output-dir "resources/public/js/test"
                               :output-to "resources/public/js/testable.js"
-                              :main "rama.test-runner"}}}})
+                              :main "movie-client.test-runner"}}}})

@@ -1,5 +1,4 @@
-
-(ns rama.alphabet
+(ns movie-client.alphabet
   (:refer-clojure :exclude [next])
   (:require [clojure.string :as str]))
 

@@ -1,4 +1,4 @@
-(ns rama.nav)
+(ns movie-client.nav)
 
 (defn page-link
   [label f]

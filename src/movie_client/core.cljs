@@ -1,13 +1,13 @@
-(ns rama.core
-  (:require-macros [rama.macro :refer [let-map]])
+(ns movie-client.core
+  (:require-macros [movie-client.macro :refer [let-map]])
   (:require [clojure.string :as str]
             [cljs.pprint :refer [pprint]]
             [reagent.core :as reagent]
             [re-frame.core :as rf]
             [day8.re-frame.http-fx]
             [ajax.core :as ajax]
-            [rama.alphabet :as alphabet]
-            [rama.nav :as nav]))
+            [movie-client.alphabet :as alphabet]
+            [movie-client.nav :as nav]))
 
 ;; TODO:
 
