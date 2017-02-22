@@ -1,4 +1,4 @@
-# movie-server
+# movie-client
 
 A project.
 
