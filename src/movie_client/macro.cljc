@@ -1,4 +1,4 @@
-(ns rama.macro)
+(ns movie-client.macro)
 
 (defmacro let-map
   [kvs]
