@@ -33,7 +33,7 @@
                           {:builds {:client {:compiler {:output-dir "target"
                                                         :optimizations :advanced
                                                         :elide-asserts true
-                                                        :closure-defines {movie-client.core/api-uri "http://mike-movie-server.heroku.com"}
+                                                        :closure-defines {movie-client.core/api-uri "http://mike-movie-server.herokuapp.com"}
                                                         :pretty-print false}}}}}}
   :figwheel {:repl false}
   :clean-targets ^{:protect false} ["resources/public/js"]
