@@ -27,7 +27,6 @@
                                                  :source-map-timestamp true}}}}}
              :prod {:cljsbuild
                     {:builds {:client {:compiler {:output-dir "target"
-                                                  :output-to "js/client.js"
                                                   :optimizations :advanced
                                                   :elide-asserts true
                                                   :closure-defines {movie-client.core/api-uri "https://mike-movie-server.heroku.com"}
