@@ -29,12 +29,12 @@
                                                  :closure-defines {movie-client.core/api-uri "http://192.168.1.141:8000"}
                                                  :source-map true
                                                  :source-map-timestamp true}}}}}
-             :prod {:cljsbuild
-                    {:builds {:client {:compiler {:output-dir "target"
-                                                  :optimizations :advanced
-                                                  :elide-asserts true
-                                                  :closure-defines {movie-client.core/api-uri "http://mike-movie-server.heroku.com"}
-                                                  :pretty-print false}}}}}}
+             :production {:cljsbuild
+                          {:builds {:client {:compiler {:output-dir "target"
+                                                        :optimizations :advanced
+                                                        :elide-asserts true
+                                                        :closure-defines {movie-client.core/api-uri "http://mike-movie-server.heroku.com"}
+                                                        :pretty-print false}}}}}}
   :figwheel {:repl false}
   :clean-targets ^{:protect false} ["resources/public/js"]
   :cljsbuild {:builds {:client {:source-paths ["src/cljs"]
