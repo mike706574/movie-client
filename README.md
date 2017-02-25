@@ -1,6 +1,6 @@
 # movie-client
 
-A project.
+A single-page application for browsing a movie collection.
 
 ## Copyright and License
 

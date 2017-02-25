@@ -1,4 +1,11 @@
 (defproject mike/movie-client "0.0.1-SNAPSHOT"
+  :description "A single-page application for browsing a movie collection."
+  :url "https://github.com/mike706574/movie-client"
+  :license {:name "Eclipse Public License - v 1.0"
+            :url "http://www.eclipse.org/legal/epl-v10.html"
+            :distribution :repo
+            :comments "same as Clojure"}
+  :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [compojure "1.4.0"]
                  [ring/ring-jetty-adapter "1.4.0"]
@@ -8,7 +15,6 @@
                  [re-frame "0.9.2"]
                  [day8.re-frame/http-fx "0.1.3"]
                  [cljs-ajax "0.5.8"]]
-  :min-lein-version "2.0.0"
   :plugins [[lein-cljsbuild "1.1.5"]
             [cider/cider-nrepl "0.14.0"]
             [org.clojure/tools.nrepl "0.2.12"]
