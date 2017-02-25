@@ -14,10 +14,10 @@
             [org.clojure/tools.nrepl "0.2.12"]
             [lein-figwheel "0.5.9"]]
   :source-paths ["src/clj"]
+  :aot :all
+  :main movie-client.server
   :hooks [leiningen.cljsbuild]
-  :profiles {:uberjar {:aot :all
-                       :main movie-client.server}
-             :dev {:dependencies [[com.cemerick/piggieback "0.2.1"]
+  :profiles {:dev {:dependencies [[com.cemerick/piggieback "0.2.1"]
                                   [figwheel-sidecar "0.5.0-2"]]
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
                    :cljsbuild
