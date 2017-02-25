@@ -15,6 +15,7 @@
             [lein-figwheel "0.5.9"]]
   :source-paths ["src/clj"]
   :aot :all
+  :uberjar-name movie-client.jar
   :main movie-client.server
   :hooks [leiningen.cljsbuild]
   :profiles {:dev {:dependencies [[com.cemerick/piggieback "0.2.1"]
