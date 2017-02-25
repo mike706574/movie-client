@@ -22,11 +22,15 @@
                                       :compiler {:main "movie-client.core"
                                                  :asset-path "js"
                                                  :optimizations :none
+                                                 :closure-defines {movie-client.core/api-uri "http://192.168.1.141:8000"}
                                                  :source-map true
                                                  :source-map-timestamp true}}}}}
              :prod {:cljsbuild
-                    {:builds {:client {:compiler {:optimizations :advanced
+                    {:builds {:client {:compiler {:output-dir "target"
+                                                  :output-to "js/client.js"
+                                                  :optimizations :advanced
                                                   :elide-asserts true
+                                                  :closure-defines {movie-client.core/api-uri "https://mike-movie-server.heroku.com"}
                                                   :pretty-print false}}}}}}
   :figwheel {:repl false}
   :clean-targets ^{:protect false} ["resources/public/js"]
@@ -35,8 +39,4 @@
   :cljsbuild
   {:builds {:client {:source-paths ["src"]
                      :compiler {:output-dir "resources/public/js"
-                                :output-to "resources/public/js/client.js"}}
-            :test {:source-paths ["src" "test"]
-                   :compiler {:output-dir "resources/public/js/test"
-                              :output-to "resources/public/js/testable.js"
-                              :main "movie-client.test-runner"}}}})
+                                :output-to "resources/public/js/client.js"}}}})

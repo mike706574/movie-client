@@ -11,6 +11,8 @@
 
 ;; TODO:
 
+(goog-define api-uri "foo")
+
 ;; -- Development --------------------------------------------------------------
 (enable-console-print!)
 
@@ -28,7 +30,7 @@
 
 (defn movies-request []
   {:method          :get
-   :uri             "http://192.168.1.141:8000/movies"
+   :uri             (str api-uri "/movies")
    :response-format (ajax/json-response-format {:keywords? true})
    :on-success      [:process-movies]
    :on-failure      [:handle-movies-failure]})
