@@ -7,10 +7,11 @@
             :comments "same as Clojure"}
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [compojure "1.4.0"]
-                 [ring/ring-jetty-adapter "1.4.0"]
+                 [com.stuartsierra/component "0.3.2"]
+                 [com.taoensso/timbre "4.8.0"]
+                 [ring/ring-jetty-adapter "1.5.1"]
                  [environ "1.1.0"]
-                 [org.clojure/clojurescript "1.9.456"]
+                 [org.clojure/clojurescript "1.9.494"]
                  [reagent "0.6.0"]
                  [re-frame "0.9.2"]
                  [day8.re-frame/http-fx "0.1.3"]
@@ -20,28 +21,36 @@
             [org.clojure/tools.nrepl "0.2.12"]
             [lein-figwheel "0.5.9"]]
   :source-paths ["src/clj"]
-  :aot :all
-  :uberjar-name "movie-client.jar"
-  :main movie-client.server
   :hooks [leiningen.cljsbuild]
-  :profiles {:dev {:dependencies [[com.cemerick/piggieback "0.2.1"]
-                                  [figwheel-sidecar "0.5.0-2"]]
+  :profiles {:dev {:source-paths ["dev"]
+                   :target-path "target/dev"
+                   :dependencies [;[clj-http "3.4.1"]
+                                  [org.clojure/tools.namespace "0.2.11"]
+                                  [com.cemerick/piggieback "0.2.1"]
+                                  [figwheel-sidecar "0.5.9"]]
                    :repl-options {:nrepl-middleware [cemerick.piggieback/wrap-cljs-repl]}
                    :cljsbuild
-                   {:builds {:client {:figwheel {:on-jsload "movie-client.core/run"
-                                                 :websocket-host "192.168.1.141"}
-                                      :compiler {:main "movie-client.core"
-                                                 :asset-path "js"
-                                                 :optimizations :none
-                                                 :closure-defines {movie-client.core/api-uri "http://192.168.1.141:8000"}
-                                                 :source-map true
-                                                 :source-map-timestamp true}}}}}
-             :production {:cljsbuild
-                          {:builds {:client {:compiler {:output-dir "target"
-                                                        :optimizations :advanced
-                                                        :elide-asserts true
-                                                        :closure-defines {movie-client.core/api-uri "https://mike-movie-server.herokuapp.com"}
-                                                        :pretty-print false}}}}}}
+                   {:builds
+                    {:client
+                     {:figwheel {:on-jsload "movie-client.core/run"
+                                 :websocket-host "192.168.1.141"}
+                      :compiler {:main "movie-client.core"
+                                 :asset-path "js"
+                                 :optimizations :none
+                                 :closure-defines {movie-client.core/api-uri "http://192.168.1.141:8000"}
+                                 :source-map true
+                                 :source-map-timestamp true}}}}}
+             :production {:aot :all
+                          :main movie-client.server
+                          :uberjar-name "movie-client.jar"
+                          :cljsbuild
+                          {:builds
+                           {:client
+                            {:compiler {:output-dir "target"
+                                        :optimizations :advanced
+                                        :elide-asserts true
+                                        :closure-defines {movie-client.core/api-uri "https://mike-movie-server.herokuapp.com"}
+                                        :pretty-print false}}}}}}
   :figwheel {:repl false}
   :clean-targets ^{:protect false} ["resources/public/js"]
   :cljsbuild {:builds {:client {:source-paths ["src/cljs"]
