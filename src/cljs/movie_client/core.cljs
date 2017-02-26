@@ -289,7 +289,9 @@
        [movie-letter-input]
        [movie-filter-input]
        [movie-pagination]]
-      [movies]])])
+      [movies]
+      [:nav
+       [movie-pagination]]])])
 
 (defn top
   []
