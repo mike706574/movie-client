@@ -2,6 +2,8 @@
 
 A single-page application for browsing a movie collection.
 
+Deployed [here](https://mike-movies.herokuapp.com). Slow to load at first because of Heroku free idling - doubly-so because the server component is a separate Heroku app.
+
 ## Copyright and License
 
 The use and distribution terms for this software are covered by the
